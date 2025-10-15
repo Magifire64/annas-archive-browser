@@ -1,6 +1,17 @@
 # Anna's [local] Archive
 
+```
+ ╔═══════════════════════════════════════════════════╗
+ ║   Anna's [local] Archive                          ║
+ ║   Browse your local torrents collection           ║
+ ╚═══════════════════════════════════════════════════╝
+```
+
 A local version of Anna's Archive that allows you to browse and access torrents directly from your own machine.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Required-blue.svg)](https://www.docker.com/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 **New to this project?** Check out the [Quick Start Guide](QUICKSTART.md) for a 5-minute setup!
 
@@ -193,6 +204,7 @@ If you need to change the default qBittorrent credentials:
 
 - **[QUICKSTART.md](QUICKSTART.md)** - 5-minute getting started guide (start here!)
 - [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and design
+- [SECURITY.md](SECURITY.md) - Security considerations and best practices
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute to the project
 - [agentinstructions.txt](agentinstructions.txt) - Original requirements
 

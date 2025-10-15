@@ -49,3 +49,6 @@ logs/
 # Environment
 .env
 .env.local
+
+# Docker override
+docker-compose.override.yml

@@ -1,0 +1,52 @@
+# Docker Compose Override Example
+# Copy this file to docker-compose.override.yml and customize as needed
+# This file takes precedence over docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Example: Map to existing torrents directory
+  webapp:
+    volumes:
+      # Uncomment and modify to use your existing torrents
+      # - /path/to/your/torrents:/data/torrents
+      - torrents_data:/data/torrents
+
+  # Example: Use different ports
+  # webapp:
+  #   ports:
+  #     - "9000:8000"  # Access web interface on port 9000
+  
+  # qbittorrent:
+  #   ports:
+  #     - "9080:8080"  # Access qBittorrent UI on port 9080
+
+  # Example: Limit MariaDB memory
+  # mariadb:
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 1G
+
+  # Example: Increase Elasticsearch memory
+  # elasticsearch:
+  #   environment:
+  #     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+
+  # Example: Disable port exposure for MariaDB (more secure)
+  # mariadb:
+  #   ports: []
+
+  # Example: Use specific timezone
+  # qbittorrent:
+  #   environment:
+  #     - TZ=America/New_York
+
+# Example: Use named volumes with specific options
+# volumes:
+#   mariadb_data:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /path/to/mariadb/data
