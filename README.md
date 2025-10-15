@@ -110,6 +110,11 @@ docker-compose logs mariadb
 docker-compose logs elasticsearch
 ```
 
+Run the test script:
+```bash
+./test.sh
+```
+
 ### Can't access the web interface
 
 Ensure localtest.me resolves to 127.0.0.1. You can also use http://localhost:8000 directly.
@@ -120,3 +125,13 @@ If you need to change the default qBittorrent credentials:
 1. Access http://localtest.me:8080
 2. Login with admin/adminadmin
 3. Go to Tools > Options > Web UI to change the password
+
+## Documentation
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and design
+- [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute to the project
+- [agentinstructions.txt](agentinstructions.txt) - Original requirements
+
+## Support
+
+For issues, questions, or suggestions, please open an issue on GitHub.

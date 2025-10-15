@@ -23,5 +23,9 @@ RUN mkdir -p /data/torrents /data/metadata
 # Expose port
 EXPOSE 8000
 
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD python -c "import requests; requests.get('http://localhost:8000/health', timeout=5)" || exit 1
+
 # Run the application
 CMD ["python", "app.py"]

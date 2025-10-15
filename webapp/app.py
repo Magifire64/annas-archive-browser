@@ -305,6 +305,39 @@ def api_stats():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    health_status = {
+        'status': 'healthy',
+        'services': {}
+    }
+    
+    # Check database
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.close()
+        health_status['services']['mariadb'] = 'healthy'
+    except Exception as e:
+        health_status['services']['mariadb'] = f'unhealthy: {str(e)}'
+        health_status['status'] = 'degraded'
+    
+    # Check Elasticsearch
+    try:
+        es_client = get_es()
+        if es_client.ping():
+            health_status['services']['elasticsearch'] = 'healthy'
+        else:
+            health_status['services']['elasticsearch'] = 'unhealthy'
+            health_status['status'] = 'degraded'
+    except Exception as e:
+        health_status['services']['elasticsearch'] = f'unhealthy: {str(e)}'
+        health_status['status'] = 'degraded'
+    
+    return jsonify(health_status)
+
 if __name__ == '__main__':
     # Wait for services to be ready
     import time
