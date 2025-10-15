@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to Anna's [local] Archive</h2>
+    <p style="margin: 1rem 0;">Browse and search your local archive of files from Anna's Archive.</p>
+    
+    <form action="/search" method="get" style="margin-top: 2rem;">
+        <div class="search-box">
+            <input type="text" name="q" placeholder="Search your local archive..." required>
+            <button type="submit">Search</button>
+        </div>
+        <label class="checkbox-label">
+            <input type="checkbox" name="local" value="true" checked>
+            <span>Show only local files</span>
+        </label>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Quick Stats</h3>
+    <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-files">-</div>
+            <div class="stat-label">Local Files</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-size">-</div>
+            <div class="stat-label">Total Size</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Getting Started</h3>
+    <ol style="margin-left: 1.5rem; line-height: 2;">
+        <li>Visit the <a href="/admin">Admin</a> page to download and load metadata</li>
+        <li>Use the <a href="http://localtest.me:8080" target="_blank">Torrent Client</a> to download torrents</li>
+        <li>Files are automatically indexed when downloads complete</li>
+        <li><a href="/search">Search</a> for files in your local archive</li>
+    </ol>
+</div>
+
+<script>
+// Load stats
+fetch('/api/stats')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('stat-files').textContent = (data.total || 0).toLocaleString();
+        
+        const sizeGB = (data.total_size || 0) / (1024 * 1024 * 1024);
+        document.getElementById('stat-size').textContent = sizeGB.toFixed(2) + ' GB';
+    })
+    .catch(error => {
+        console.error('Error loading stats:', error);
+    });
+</script>
+{% endblock %}

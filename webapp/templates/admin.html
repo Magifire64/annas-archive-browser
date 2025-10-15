@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>Admin Panel</h2>
+    <p>Manage metadata, torrents, and file indexing for your local archive.</p>
+</div>
+
+<div class="card">
+    <h3>Metadata Management</h3>
+    <p style="margin-bottom: 1rem;">Download and load the latest metadata from Anna's Archive.</p>
+    
+    <div id="metadata-status"></div>
+    
+    <button class="btn" onclick="downloadMetadata()">Download aa_derived_mirror_metadata</button>
+    <button class="btn btn-success" onclick="loadMetadata()">Load Metadata into Databases</button>
+</div>
+
+<div class="card">
+    <h3>File Indexing</h3>
+    <p style="margin-bottom: 1rem;">Index files from your torrent downloads directory.</p>
+    
+    <div id="indexing-status"></div>
+    
+    <button class="btn" onclick="indexFiles()">Index Local Files</button>
+</div>
+
+<div class="card">
+    <h3>Available Torrents</h3>
+    <p style="margin-bottom: 1rem;">Browse and download torrents from Anna's Archive.</p>
+    
+    <div id="torrents-status"></div>
+    
+    <button class="btn" onclick="loadTorrents()">Load Available Torrents</button>
+    
+    <div id="torrents-list" style="margin-top: 1rem; display: none;">
+        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 1rem; border-radius: 4px;">
+            <div id="torrents-content"></div>
+        </div>
+        <p style="margin-top: 0.5rem; color: #7f8c8d; font-size: 0.9rem;">
+            Copy torrent URLs and add them to your <a href="http://localtest.me:8080" target="_blank">Torrent Client</a>
+        </p>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Archive Statistics</h3>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-files">-</div>
+            <div class="stat-label">Local Files</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-size">-</div>
+            <div class="stat-label">Total Size</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load stats
+function loadStats() {
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('stat-files').textContent = (data.total || 0).toLocaleString();
+            
+            const sizeGB = (data.total_size || 0) / (1024 * 1024 * 1024);
+            document.getElementById('stat-size').textContent = sizeGB.toFixed(2) + ' GB';
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+        });
+}
+
+function downloadMetadata() {
+    const statusDiv = document.getElementById('metadata-status');
+    statusDiv.innerHTML = '<div class="alert alert-info">Downloading metadata...</div>';
+    
+    fetch('/api/download-metadata', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'started') {
+            statusDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+        } else {
+            statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + (data.error || 'Unknown error') + '</div>';
+        }
+    })
+    .catch(error => {
+        statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + error + '</div>';
+    });
+}
+
+function loadMetadata() {
+    const statusDiv = document.getElementById('metadata-status');
+    statusDiv.innerHTML = '<div class="alert alert-info">Loading metadata into databases...</div>';
+    
+    fetch('/api/load-metadata', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'started') {
+            statusDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+        } else {
+            statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + (data.error || 'Unknown error') + '</div>';
+        }
+    })
+    .catch(error => {
+        statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + error + '</div>';
+    });
+}
+
+function indexFiles() {
+    const statusDiv = document.getElementById('indexing-status');
+    statusDiv.innerHTML = '<div class="alert alert-info">Indexing files... This may take a while.</div>';
+    
+    fetch('/api/index-files', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'completed') {
+            statusDiv.innerHTML = '<div class="alert alert-success">Successfully indexed ' + data.files_indexed + ' files!</div>';
+            loadStats();
+        } else {
+            statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + (data.error || 'Unknown error') + '</div>';
+        }
+    })
+    .catch(error => {
+        statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + error + '</div>';
+    });
+}
+
+function loadTorrents() {
+    const statusDiv = document.getElementById('torrents-status');
+    const listDiv = document.getElementById('torrents-list');
+    const contentDiv = document.getElementById('torrents-content');
+    
+    statusDiv.innerHTML = '<div class="alert alert-info">Loading torrents list...</div>';
+    
+    fetch('/api/torrents')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                statusDiv.innerHTML = '<div class="alert alert-error">Error: ' + data.error + '</div>';
+                return;
+            }
+            
+            statusDiv.innerHTML = '<div class="alert alert-success">Loaded ' + (Array.isArray(data) ? data.length : Object.keys(data).length) + ' torrents</div>';
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<tr style="background: #ecf0f1;"><th style="padding: 0.5rem; text-align: left;">Name</th><th style="padding: 0.5rem; text-align: left;">Size</th><th style="padding: 0.5rem; text-align: left;">URL</th></tr>';
+            
+            const torrents = Array.isArray(data) ? data : Object.values(data);
+            torrents.forEach(torrent => {
+                html += '<tr style="border-bottom: 1px solid #eee;">';
+                html += '<td style="padding: 0.5rem;">' + (torrent.name || torrent.display_name || 'Unknown') + '</td>';
+                html += '<td style="padding: 0.5rem;">' + (torrent.size_formatted || torrent.size || '-') + '</td>';
+                html += '<td style="padding: 0.5rem;"><a href="' + (torrent.url || '#') + '" target="_blank">Download</a></td>';
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            contentDiv.innerHTML = html;
+            listDiv.style.display = 'block';
+        })
+        .catch(error => {
+            statusDiv.innerHTML = '<div class="alert alert-error">Error loading torrents: ' + error + '</div>';
+        });
+}
+
+// Load stats on page load
+loadStats();
+</script>
+{% endblock %}
