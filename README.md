@@ -203,9 +203,11 @@ If you need to change the default qBittorrent credentials:
 ## Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - 5-minute getting started guide (start here!)
+- [USER_GUIDE.md](USER_GUIDE.md) - Complete user guide with all features explained
 - [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and design
 - [SECURITY.md](SECURITY.md) - Security considerations and best practices
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute to the project
+- [CHANGELOG.md](CHANGELOG.md) - Version history and changes
 - [agentinstructions.txt](agentinstructions.txt) - Original requirements
 
 ## Frequently Asked Questions (FAQ)
